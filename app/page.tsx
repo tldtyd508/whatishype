@@ -55,6 +55,9 @@ export default function Home() {
       const res = await fetch('/api/namuwiki');
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data: FeedResponse<NamuKeyword> = await res.json();
+      if (data.blocked) {
+        setNamuError(`[접근 제한] ${data.reason}`);
+      }
       setNamuKeywords(data.posts);
     } catch (err) {
       setNamuError(err instanceof Error ? err.message : '오류');
@@ -85,6 +88,9 @@ export default function Home() {
       const res = await fetch('/api/reddit');
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data: FeedResponse<RedditPost> = await res.json();
+      if (data.blocked) {
+        setRedditError(`[접근 제한] ${data.reason}`);
+      }
       setRedditPosts(data.posts.slice(0, 10));
     } catch (err) {
       setRedditError(err instanceof Error ? err.message : '오류');

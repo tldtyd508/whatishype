@@ -32,8 +32,9 @@ export default function NamuRanking({ keywords, isLoading, error }: NamuRankingP
                 )}
 
                 {error && (
-                    <div className="p-4 text-center text-xs text-red-400">
-                        불러올 수 없습니다
+                    <div className="p-4 text-center">
+                        <p className="text-xs text-red-500 dark:text-red-400 mb-2 font-medium">데이터를 불러올 수 없습니다</p>
+                        <p className="text-[10px] text-gray-500 dark:text-gray-400 leading-relaxed whitespace-pre-wrap">{error}</p>
                     </div>
                 )}
 
@@ -54,8 +55,8 @@ export default function NamuRanking({ keywords, isLoading, error }: NamuRankingP
                                     className="flex items-center gap-3 py-2 px-3 rounded-xl hover:bg-white/40 dark:hover:bg-white/[0.04] transition-colors group"
                                 >
                                     <span className={`flex-shrink-0 w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-bold ${kw.rank <= 3
-                                            ? 'bg-gradient-to-br from-emerald-500 to-teal-400 text-white'
-                                            : 'bg-white/10 dark:bg-white/5 text-gray-500 dark:text-gray-500'
+                                        ? 'bg-gradient-to-br from-emerald-500 to-teal-400 text-white'
+                                        : 'bg-white/10 dark:bg-white/5 text-gray-500 dark:text-gray-500'
                                         }`}>
                                         {kw.rank}
                                     </span>

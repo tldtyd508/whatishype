@@ -69,9 +69,12 @@ export default function FeedColumn({
                 )}
 
                 {error && (
-                    <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-6 text-center">
-                        <div className="text-red-400 text-sm font-medium mb-1">데이터를 불러올 수 없습니다</div>
-                        <div className="text-red-400/60 text-xs">{error}</div>
+                    <div className="rounded-xl flex flex-col items-center justify-center bg-red-500/10 border border-red-500/20 p-6 text-center h-full min-h-[160px]">
+                        <svg className="w-8 h-8 text-red-500/80 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        <div className="text-red-400 text-sm font-bold mb-2">데이터 접근 제한</div>
+                        <div className="text-red-400/80 text-[11px] whitespace-pre-wrap leading-relaxed">{error}</div>
                     </div>
                 )}
 

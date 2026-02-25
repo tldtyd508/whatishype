@@ -34,4 +34,6 @@ export interface NamuKeyword {
 export interface FeedResponse<T> {
     posts: T[];
     updatedAt: string;
+    blocked?: boolean;
+    reason?: string;
 }
