@@ -4,10 +4,11 @@ import { useState, useEffect, useCallback } from 'react';
 import Header from '@/app/components/Header';
 import TrendCard from '@/app/components/TrendCard';
 import NamuRanking from '@/app/components/NamuRanking';
+import XTrends from '@/app/components/XTrends';
 import FeedColumn from '@/app/components/FeedColumn';
 import DcPostCard from '@/app/components/DcPostCard';
 import RedditPostCard from '@/app/components/RedditPostCard';
-import type { GoogleTrend, NamuKeyword, DcPost, RedditPost, FeedResponse } from '@/app/lib/types';
+import type { GoogleTrend, NamuKeyword, DcPost, RedditPost, XTrend, FeedResponse } from '@/app/lib/types';
 
 export default function Home() {
   // Google Trends
@@ -19,6 +20,11 @@ export default function Home() {
   const [namuKeywords, setNamuKeywords] = useState<NamuKeyword[]>([]);
   const [namuLoading, setNamuLoading] = useState(true);
   const [namuError, setNamuError] = useState<string | null>(null);
+
+  // X Trends
+  const [xTrends, setXTrends] = useState<XTrend[]>([]);
+  const [xLoading, setXLoading] = useState(true);
+  const [xError, setXError] = useState<string | null>(null);
 
   // DC
   const [dcPosts, setDcPosts] = useState<DcPost[]>([]);
@@ -66,6 +72,24 @@ export default function Home() {
     }
   }, []);
 
+  const fetchXTrends = useCallback(async () => {
+    setXLoading(true);
+    setXError(null);
+    try {
+      const res = await fetch('/api/x-trends');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data: FeedResponse<XTrend> = await res.json();
+      if (data.blocked) {
+        setXError(`[접근 제한] ${data.reason}`);
+      }
+      setXTrends(data.posts);
+    } catch (err) {
+      setXError(err instanceof Error ? err.message : '오류');
+    } finally {
+      setXLoading(false);
+    }
+  }, []);
+
   const fetchDc = useCallback(async () => {
     setDcLoading(true);
     setDcError(null);
@@ -102,15 +126,16 @@ export default function Home() {
   const fetchAll = useCallback(() => {
     fetchTrends();
     fetchNamu();
+    fetchXTrends();
     fetchDc();
     fetchReddit();
-  }, [fetchTrends, fetchNamu, fetchDc, fetchReddit]);
+  }, [fetchTrends, fetchNamu, fetchXTrends, fetchDc, fetchReddit]);
 
   useEffect(() => {
     fetchAll();
   }, [fetchAll]);
 
-  const isLoading = trendsLoading || namuLoading || dcLoading || redditLoading;
+  const isLoading = trendsLoading || namuLoading || xLoading || dcLoading || redditLoading;
 
   // Determine card sizes based on traffic
   const getCardSize = (trend: GoogleTrend): 'large' | 'medium' | 'small' => {
@@ -184,9 +209,18 @@ export default function Home() {
             )}
           </section>
 
-          {/* ===== Section 2: NamuWiki + Community Feeds ===== */}
+          {/* ===== Section 2: Trends + Community Feeds ===== */}
           <section>
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* X Trends Sidebar */}
+              <div className="lg:col-span-3">
+                <XTrends
+                  trends={xTrends}
+                  isLoading={xLoading}
+                  error={xError}
+                />
+              </div>
+
               {/* NamuWiki Sidebar */}
               <div className="lg:col-span-3">
                 <NamuRanking
@@ -197,7 +231,7 @@ export default function Home() {
               </div>
 
               {/* Community Feeds */}
-              <div className="lg:col-span-9">
+              <div className="lg:col-span-6">
                 <div className="flex items-center gap-2.5 mb-4 px-1">
                   <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-gray-600 to-gray-800 dark:from-gray-400 dark:to-gray-600 flex items-center justify-center shadow-lg">
                     <span className="text-white text-sm">💬</span>
@@ -249,7 +283,7 @@ export default function Home() {
               What is Hype? — 지금 이 순간, 인터넷이 뜨거워하는 것들
             </p>
             <p className="text-[10px] text-gray-300 dark:text-gray-700 mt-1">
-              Google Trends · 나무위키 · DC인사이드 · Reddit
+              Google Trends · X (Twitter) · 나무위키 · DC인사이드 · Reddit
             </p>
           </footer>
         </main>

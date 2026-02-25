@@ -31,6 +31,12 @@ export interface NamuKeyword {
     keyword: string;
 }
 
+export interface XTrend {
+    rank: number;
+    keyword: string;
+    tweetCount?: string;
+}
+
 export interface FeedResponse<T> {
     posts: T[];
     updatedAt: string;
