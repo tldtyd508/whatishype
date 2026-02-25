@@ -3,7 +3,7 @@
 ## 1. 서비스 개요
 - **서비스 이름:** What is Hype?
 - **서비스 슬로건:** 지금 이 순간, 인터넷이 뜨거워하는 것들
-- **핵심 목적 (MVP):** 검색 트렌드(Google Trends, 나무위키)와 커뮤니티 인기글(DC인사이드, Reddit)을 통합하여 "지금 뭐가 핫한지"를 한눈에 파악
+- **핵심 목적 (MVP):** 검색 트렌드(Google Trends, X)와 커뮤니티 인기글(DC인사이드, FMKorea)을 통합하여 "지금 뭐가 핫한지"를 한눈에 파악
 - **최종 비전:** 네이버 실검의 현대적 대체재 — 플랫폼에 종속되지 않는 실시간 Hype 트래커
 
 ## 2. 타겟 사용자 및 핵심 가치
@@ -15,8 +15,8 @@
 | 카테고리 | 기능 명세 (MVP 범위) | 비고 (V2 확장 계획) |
 | --- | --- | --- |
 | **Google Trends Hero** | 실시간 급상승 키워드 카드 그리드<br>트래픽 규모별 시각적 강조 (500+, 2K+ 등)<br>관련 뉴스 제목·썸네일 표시 | 시간별 트렌드 그래프 |
-| **나무위키 실검** | 실시간 검색어 Top 10 리스트<br>나무위키 문서 링크 연결 | 검색어 변동 추적 (NEW, ↑↓) |
-| **커뮤니티 Hype** | DC 실베 + Reddit Hot 각 10개<br>갤러리/서브레딧 태그·댓글·추천 표시 | 펨코 포텐, X(Twitter) 트렌드 추가 |
+| **X (Twitter) 트렌드** | 실시간 트렌드 Top 10 리스트<br>X 검색 링크 연결 | 트윗량 변동 추이 |
+| **커뮤니티 Hype** | DC 실베 + FMKorea 포텐 각 10개<br>갤러리/카테고리 태그·작성자 등 표시 | 추가 커뮤니티(인스티즈 등) |
 | **실시간 새로고침** | 수동 새로고침 버튼 + 마지막 업데이트 시간 | 자동 폴링 (30초 간격) |
 | **다크 모드** | 기본 다크 + 토글 전환 (localStorage 저장) | 테마 커스터마이징 |
 | **반응형 UI** | 모바일 1-col / 데스크톱 3-section | 태블릿 최적화 |
@@ -28,9 +28,9 @@
 | 소스 | 엔드포인트 | 방식 | 인증 | 갱신 |
 |------|-----------|------|------|------|
 | Google Trends KR | `trends.google.com/trending/rss?geo=KR` | RSS XML parse | 불필요 | 실시간 |
-| 나무위키 실검 | `search.namu.wiki/api/ranking` | JSON proxy | 불필요 | ~30분 |
+| X (Twitter) 트렌드 | `trends24.in/korea` | Cheerio 스크래핑 | 불필요 | 실시간 |
 | DC 실시간 베스트 | `gall.dcinside.com/board/lists/?id=dcbest` | Cheerio 스크래핑 | 불필요 | 실시간 |
-| Reddit r/popular | `old.reddit.com/r/popular.json` | JSON API | 불필요 | 실시간 |
+| FMKorea 포텐 | `fmkorea.com/best` | Cheerio 스크래핑 | 불필요 | 실시간 |
 
 ### 기술 스택
 - **프레임워크:** Next.js 16 (App Router, TypeScript)
