@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
 const inter = Inter({
@@ -8,13 +9,16 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "What is Hype? — 지금 인터넷이 뜨거워하는 것들",
-  description:
-    "Google Trends, 나무위키, DC인사이드, Reddit — 지금 이 순간 인터넷에서 가장 핫한 키워드와 트렌드를 한눈에.",
+  title: "What Is Hype | 요즘 뜨는 트렌드",
+  description: "지금 당장 폼 미친, 가장 핫한 트렌드를 확인하세요.",
   keywords: ["트렌드", "실시간", "인기", "hype", "Google Trends", "나무위키", "DC인사이드", "Reddit"],
   openGraph: {
-    title: "What is Hype?",
-    description: "지금 이 순간, 인터넷이 뜨거워하는 것들",
+    title: "What Is Hype | 요즘 뜨는 트렌드",
+    description: "지금 당장 폼 미친, 가장 핫한 트렌드를 확인하세요.",
+    url: "https://whatishype.vercel.app",
+    siteName: "What Is Hype",
+    images: [{ url: "https://whatishype.vercel.app/og-image.png", width: 1200, height: 630 }],
+    locale: "ko_KR",
     type: "website",
   },
 };
@@ -28,6 +32,7 @@ export default function RootLayout({
     <html lang="ko" className="dark" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased`}>
         {children}
+        <Analytics />
       </body>
     </html>
   );
