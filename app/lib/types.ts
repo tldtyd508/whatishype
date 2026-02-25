@@ -16,6 +16,20 @@ export interface RedditPost {
     thumbnail?: string;
 }
 
+export interface GoogleNewsPost {
+    rank: number;
+    title: string;
+    url: string;
+    source: string;
+    time: string;
+}
+
+export interface MelonSong {
+    rank: number;
+    title: string;
+    artist: string;
+}
+
 export interface GoogleTrend {
     rank: number;
     keyword: string;
@@ -35,14 +49,6 @@ export interface XTrend {
     rank: number;
     keyword: string;
     tweetCount?: string;
-}
-
-export interface FmKoreaPost {
-    rank: number;
-    title: string;
-    url: string;
-    category: string;
-    author: string;
 }
 
 export interface FeedResponse<T> {

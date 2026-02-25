@@ -5,9 +5,9 @@ import Header from '@/app/components/Header';
 import TrendCard from '@/app/components/TrendCard';
 import XTrends from '@/app/components/XTrends';
 import FeedColumn from '@/app/components/FeedColumn';
-import DcPostCard from '@/app/components/DcPostCard';
-import FmKoreaPostCard from '@/app/components/FmKoreaPostCard';
-import type { GoogleTrend, DcPost, FmKoreaPost, XTrend, FeedResponse } from '@/app/lib/types';
+import GoogleNewsCard from '@/app/components/GoogleNewsCard';
+import MelonChartCard from '@/app/components/MelonChartCard';
+import type { GoogleTrend, GoogleNewsPost, MelonSong, XTrend, FeedResponse } from '@/app/lib/types';
 
 export default function Home() {
   // Google Trends
@@ -20,15 +20,15 @@ export default function Home() {
   const [xLoading, setXLoading] = useState(true);
   const [xError, setXError] = useState<string | null>(null);
 
-  // DC
-  const [dcPosts, setDcPosts] = useState<DcPost[]>([]);
-  const [dcLoading, setDcLoading] = useState(true);
-  const [dcError, setDcError] = useState<string | null>(null);
+  // Google News
+  const [newsPosts, setNewsPosts] = useState<GoogleNewsPost[]>([]);
+  const [newsLoading, setNewsLoading] = useState(true);
+  const [newsError, setNewsError] = useState<string | null>(null);
 
-  // FMKorea
-  const [fmPosts, setFmPosts] = useState<FmKoreaPost[]>([]);
-  const [fmLoading, setFmLoading] = useState(true);
-  const [fmError, setFmError] = useState<string | null>(null);
+  // Melon Chart
+  const [melonSongs, setMelonSongs] = useState<MelonSong[]>([]);
+  const [melonLoading, setMelonLoading] = useState(true);
+  const [melonError, setMelonError] = useState<string | null>(null);
 
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
 
@@ -66,51 +66,54 @@ export default function Home() {
     }
   }, []);
 
-  const fetchDc = useCallback(async () => {
-    setDcLoading(true);
-    setDcError(null);
+  const fetchNews = useCallback(async () => {
+    setNewsLoading(true);
+    setNewsError(null);
     try {
-      const res = await fetch('/api/dcinside');
+      const res = await fetch('/api/google-news');
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data: FeedResponse<DcPost> = await res.json();
-      setDcPosts(data.posts.slice(0, 10));
+      const data: FeedResponse<GoogleNewsPost> = await res.json();
+      if (data.blocked) {
+        setNewsError(`[접근 제한] ${data.reason}`);
+      }
+      setNewsPosts(data.posts.slice(0, 10)); // Top 10 for layout balance
     } catch (err) {
-      setDcError(err instanceof Error ? err.message : '오류');
+      setNewsError(err instanceof Error ? err.message : '오류');
     } finally {
-      setDcLoading(false);
+      setNewsLoading(false);
     }
   }, []);
 
-  const fetchFmKorea = useCallback(async () => {
-    setFmLoading(true);
-    setFmError(null);
+  const fetchMelon = useCallback(async () => {
+    setMelonLoading(true);
+    setMelonError(null);
     try {
-      const res = await fetch('/api/fmkorea');
+      const res = await fetch('/api/melon');
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data: FeedResponse<FmKoreaPost> = await res.json();
+      const data: FeedResponse<MelonSong> = await res.json();
       if (data.blocked) {
-        setFmError(`[접근 제한] ${data.reason}`);
+        setMelonError(`[접근 제한] ${data.reason}`);
       }
-      setFmPosts(data.posts.slice(0, 10)); // Top 10 for layout balance
+      setMelonSongs(data.posts.slice(0, 10)); // Top 10 for layout balance
     } catch (err) {
-      setFmError(err instanceof Error ? err.message : '오류');
+      setMelonError(err instanceof Error ? err.message : '오류');
     } finally {
-      setFmLoading(false);
+      setMelonLoading(false);
     }
   }, []);
 
   const fetchAll = useCallback(() => {
     fetchTrends();
     fetchXTrends();
-    fetchDc();
-    fetchFmKorea();
-  }, [fetchTrends, fetchXTrends, fetchDc, fetchFmKorea]);
+    fetchNews();
+    fetchMelon();
+  }, [fetchTrends, fetchXTrends, fetchNews, fetchMelon]);
 
   useEffect(() => {
     fetchAll();
   }, [fetchAll]);
 
-  const isLoading = trendsLoading || xLoading || dcLoading || fmLoading;
+  const isLoading = trendsLoading || xLoading || newsLoading || melonLoading;
 
   // Determine card sizes based on traffic
   const getCardSize = (trend: GoogleTrend): 'large' | 'medium' | 'small' => {
@@ -196,42 +199,42 @@ export default function Home() {
                 />
               </div>
 
-              {/* Community Feeds */}
+              {/* Realtime Hype Feeds */}
               <div className="lg:col-span-9">
                 <div className="flex items-center gap-2.5 mb-4 px-1">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-gray-600 to-gray-800 dark:from-gray-400 dark:to-gray-600 flex items-center justify-center shadow-lg">
-                    <span className="text-white text-sm">💬</span>
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-800 dark:from-indigo-400 dark:to-indigo-600 flex items-center justify-center shadow-lg">
+                    <span className="text-white text-sm">📰</span>
                   </div>
-                  <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">커뮤니티 Hype</h2>
-                  <span className="text-xs text-gray-400 dark:text-gray-500">실시간 인기글</span>
+                  <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">실시간 Hype</h2>
+                  <span className="text-xs text-gray-400 dark:text-gray-500">종합 뉴스 & 음원</span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* DC Feed */}
+                  {/* Google News Feed */}
                   <FeedColumn
-                    title="DC 실시간 베스트"
-                    icon={<span className="text-white text-sm font-bold">DC</span>}
+                    title="주요 뉴스"
+                    icon={<span className="text-white text-sm font-bold">GN</span>}
                     accentColor="blue"
-                    count={dcPosts.length}
-                    isLoading={dcLoading}
-                    error={dcError}
+                    count={newsPosts.length}
+                    isLoading={newsLoading}
+                    error={newsError}
                   >
-                    {dcPosts.map((post) => (
-                      <DcPostCard key={`dc-${post.rank}-${post.link}`} post={post} />
+                    {newsPosts.map((post) => (
+                      <GoogleNewsCard key={`news-${post.rank}`} post={post} />
                     ))}
                   </FeedColumn>
 
-                  {/* FMKorea Feed */}
+                  {/* Melon Chart Feed */}
                   <FeedColumn
-                    title="FMKorea 포텐"
-                    icon={<span className="text-white text-sm font-bold">FM</span>}
-                    accentColor="orange"
-                    count={fmPosts.length}
-                    isLoading={fmLoading}
-                    error={fmError}
+                    title="Melon 차트 Top 10"
+                    icon={<span className="text-white text-sm font-bold">🎵</span>}
+                    accentColor="emerald"
+                    count={melonSongs.length}
+                    isLoading={melonLoading}
+                    error={melonError}
                   >
-                    {fmPosts.map((post) => (
-                      <FmKoreaPostCard key={`fm-${post.rank}-${post.url}`} post={post} />
+                    {melonSongs.map((post) => (
+                      <MelonChartCard key={`melon-${post.rank}`} post={post} />
                     ))}
                   </FeedColumn>
                 </div>
@@ -245,7 +248,7 @@ export default function Home() {
               What is Hype? — 지금 이 순간, 인터넷이 뜨거워하는 것들
             </p>
             <p className="text-[10px] text-gray-300 dark:text-gray-700 mt-1">
-              Google Trends · X (Twitter) · DC인사이드 · FMKorea
+              Google Trends · Google News · X (Twitter) · Melon
             </p>
           </footer>
         </main>

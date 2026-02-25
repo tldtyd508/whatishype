@@ -3,10 +3,10 @@ import React from 'react';
 interface FeedColumnProps {
     title: string;
     icon: React.ReactNode;
-    accentColor: 'blue' | 'orange';
+    accentColor: 'blue' | 'orange' | 'emerald';
     count: number;
-    isLoading: boolean;
-    error: string | null;
+    isLoading?: boolean;
+    error?: string | null;
     children: React.ReactNode;
 }
 
@@ -22,12 +22,16 @@ export default function FeedColumn({
     const gradientClass =
         accentColor === 'blue'
             ? 'from-blue-500 to-cyan-400'
-            : 'from-orange-500 to-red-400';
+            : accentColor === 'emerald'
+                ? 'from-emerald-500 to-teal-400'
+                : 'from-orange-500 to-red-400';
 
     const countBgClass =
         accentColor === 'blue'
             ? 'bg-blue-500/15 text-blue-400'
-            : 'bg-orange-500/15 text-orange-400';
+            : accentColor === 'emerald'
+                ? 'bg-emerald-500/15 text-emerald-400'
+                : 'bg-orange-500/15 text-orange-400';
 
     return (
         <div className="flex flex-col h-full">
