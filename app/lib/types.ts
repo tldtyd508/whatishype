@@ -37,6 +37,14 @@ export interface XTrend {
     tweetCount?: string;
 }
 
+export interface FmKoreaPost {
+    rank: number;
+    title: string;
+    url: string;
+    category: string;
+    author: string;
+}
+
 export interface FeedResponse<T> {
     posts: T[];
     updatedAt: string;
