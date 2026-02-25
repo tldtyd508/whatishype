@@ -56,7 +56,7 @@ export default function Header({ onRefresh, isLoading, lastUpdated }: HeaderProp
                                 What is Hype?
                             </h1>
                             <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 -mt-0.5">
-                                DC인사이드 × Reddit 실시간 트렌드
+                                지금 인터넷이 뜨거워하는 것들
                             </p>
                         </div>
                     </div>
