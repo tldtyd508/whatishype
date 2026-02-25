@@ -23,51 +23,70 @@ interface RedditApiResponse {
 }
 
 export async function GET() {
-    try {
-        const res = await fetch('https://old.reddit.com/r/popular.json?limit=30&raw_json=1', {
-            headers: {
-                'User-Agent': 'WhatIsHype/1.0 (Next.js Server-Side; contact: dev@example.com)',
-                Accept: 'application/json',
-            },
-            next: { revalidate: 0 },
-        });
+    // Try multiple Reddit endpoints — some are blocked by datacenter IPs
+    const endpoints = [
+        'https://www.reddit.com/r/popular/hot.json?limit=30&raw_json=1',
+        'https://old.reddit.com/r/popular.json?limit=30&raw_json=1',
+    ];
 
-        if (!res.ok) {
-            throw new Error(`Reddit fetch failed: ${res.status}`);
-        }
-
-        const data = (await res.json()) as RedditApiResponse;
-
-        const posts: RedditPost[] = data.data.children
-            .filter((child) => !child.data.stickied)
-            .slice(0, 30)
-            .map((child, index) => {
-                const d = child.data;
-                const thumbnail =
-                    d.thumbnail && d.thumbnail.startsWith('http') ? d.thumbnail : undefined;
-
-                return {
-                    rank: index + 1,
-                    title: d.title,
-                    subreddit: d.subreddit,
-                    score: d.score,
-                    numComments: d.num_comments,
-                    permalink: `https://reddit.com${d.permalink}`,
-                    thumbnail,
-                };
+    for (const url of endpoints) {
+        try {
+            const res = await fetch(url, {
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (compatible; WhatIsHype/1.0; +https://whatishype.vercel.app)',
+                    Accept: 'application/json, text/plain, */*',
+                },
+                next: { revalidate: 0 },
+                signal: AbortSignal.timeout(8000),
             });
 
-        const response: FeedResponse<RedditPost> = {
-            posts,
-            updatedAt: new Date().toISOString(),
-        };
+            if (!res.ok) {
+                console.warn(`Reddit fetch ${url} returned ${res.status}, trying next...`);
+                continue;
+            }
 
-        return NextResponse.json(response);
-    } catch (error) {
-        console.error('Reddit API error:', error);
-        return NextResponse.json(
-            { error: 'Failed to fetch Reddit data', posts: [], updatedAt: new Date().toISOString() },
-            { status: 500 }
-        );
+            const data = (await res.json()) as RedditApiResponse;
+
+            if (!data?.data?.children?.length) {
+                console.warn(`Reddit ${url} returned empty children, trying next...`);
+                continue;
+            }
+
+            const posts: RedditPost[] = data.data.children
+                .filter((child) => !child.data.stickied)
+                .slice(0, 30)
+                .map((child, index) => {
+                    const d = child.data;
+                    const thumbnail =
+                        d.thumbnail && d.thumbnail.startsWith('http') ? d.thumbnail : undefined;
+
+                    return {
+                        rank: index + 1,
+                        title: d.title,
+                        subreddit: d.subreddit,
+                        score: d.score,
+                        numComments: d.num_comments,
+                        permalink: `https://reddit.com${d.permalink}`,
+                        thumbnail,
+                    };
+                });
+
+            const response: FeedResponse<RedditPost> = {
+                posts,
+                updatedAt: new Date().toISOString(),
+            };
+
+            return NextResponse.json(response);
+        } catch (error) {
+            console.warn(`Reddit fetch ${url} failed:`, error instanceof Error ? error.message : error);
+            continue;
+        }
     }
+
+    // All endpoints failed
+    console.error('All Reddit endpoints failed');
+    return NextResponse.json(
+        { error: 'Failed to fetch Reddit data', posts: [], updatedAt: new Date().toISOString() },
+        { status: 500 }
+    );
 }
